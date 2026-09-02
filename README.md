@@ -1,132 +1,131 @@
 # OutGuess for Windows
 
-Ferramenta de esteganografia para ocultar arquivos em imagens JPEG, PNM e
-PPM. Esta versão inclui adaptação nativa para Windows 64-bit e uma interface
-gráfica Win32 para os fluxos mais comuns.
+Port do **OutGuess** para Windows 64-bit, com suporte a linha de comando e
+uma interface gráfica Win32 para os fluxos mais comuns de esteganografia.
 
-> Use somente em arquivos próprios ou com autorização. Esteganografia não
-> substitui criptografia: proteja o conteúdo com uma chave forte.
+> **Uso responsável:** utilize somente em arquivos próprios ou com autorização.
+> Esteganografia não substitui criptografia; se o conteúdo for sensível,
+> proteja-o adequadamente antes de ocultá-lo.
+
+## Download
+
+Baixe a versão mais recente na página de
+[Releases](https://github.com/joaosbguilherme-ui/OutGuess-for-Windows/releases).
+
+Veja as instruções completas para Windows em
+[README-WINDOWS.md](README-WINDOWS.md).
 
 ## Recursos
 
-- Ocultação e extração de mensagens em imagens.
+- Ocultação e extração de arquivos em imagens JPEG.
+- Suporte a imagens PNM e PPM conforme o OutGuess.
 - Chave secreta para codificação do payload.
 - Correção de erros Golay com a opção `-e`.
-- Preservação de estatísticas de frequência em JPEG.
-- Executáveis Windows compilados estaticamente.
-- Interface gráfica nativa em `bin-win64/outguess-gui.c`.
+- Preservação das estatísticas de frequência em JPEG.
+- Executáveis Windows 64-bit.
+- Interface gráfica nativa Win32.
+- Build com MinGW-w64.
+- Compatibilidade da linha de comando com o uso tradicional do OutGuess.
 
-## Uso rápido no Windows
+## Uso rápido
 
-Os executáveis prontos ficam em `bin-win64/`:
+Os binários prontos ficam em `bin-win64/`.
 
-```powershell
-cd "C:\caminho\OutGuess-Windows\bin-win64"
-```
-
-Para ocultar `mensagem.txt` em `imagem.jpg`:
+### Ocultar um arquivo
 
 ```powershell
+cd "C:\caminho\OutGuess-for-Windows\bin-win64"
+
 .\outguess.exe -k "minha-chave" -d ".\mensagem.txt" ".\imagem.jpg" ".\saida.jpg"
 ```
 
-Para extrair a mensagem:
+### Extrair um arquivo
 
 ```powershell
 .\outguess.exe -k "minha-chave" -r ".\saida.jpg" ".\mensagem-recuperada.txt"
 ```
 
-Os arquivos de entrada precisam existir. A chave usada na extração deve ser
-exatamente a mesma usada para ocultar a mensagem.
+A chave utilizada na extração deve ser exatamente a mesma utilizada na
+inserção. Os arquivos de entrada e os diretórios de destino precisam existir.
+
+### Ver a ajuda
+
+```powershell
+.\outguess.exe -h
+```
 
 ## Interface gráfica
 
-Após compilar, mantenha `outguess-gui.exe` e `outguess.exe` na mesma pasta e
-execute:
+Após compilar, mantenha `outguess-gui.exe` e `outguess.exe` na mesma pasta.
 
 ```powershell
 Start-Process ".\outguess-gui.exe"
 ```
 
-A interface permite selecionar a imagem, o arquivo da mensagem, o destino,
-a chave e a opção de correção de erros.
+A GUI permite selecionar a imagem, o arquivo a ser ocultado, o destino, a
+chave e a opção de correção de erros.
 
-## Compilar no Windows
+## Compilação
 
-### MSYS2 MinGW64
+Para instruções completas de instalação, dependências, compilação e
+solução de problemas no Windows, consulte
+[README-WINDOWS.md](README-WINDOWS.md).
 
-Instale o [MSYS2](https://www.msys2.org/) e abra **MSYS2 MinGW 64-bit**. No
-terminal MSYS2, instale as ferramentas:
+Resumo com MSYS2 MinGW64:
 
 ```bash
 pacman -Syu
 pacman -Su
 pacman -S --needed mingw-w64-x86_64-gcc make
-```
 
-Se o primeiro comando pedir para fechar o terminal, feche-o, abra novamente
-**MSYS2 MinGW 64-bit** e continue com os comandos seguintes.
-
-Compile o projeto:
-
-```bash
-cd /c/Users/VAIO/Downloads/OutGuess-Windows/OutGuess-Windows/src
+cd /c/caminho/OutGuess-for-Windows/src
 make -f Makefile.mingw
 ```
 
-O build gera `outguess.exe`, `histogram.exe` e `outguess-gui.exe` em `src/`.
-
-Para executar a GUI pelo PowerShell:
-
-```powershell
-Start-Process "C:\Users\VAIO\Downloads\OutGuess-Windows\OutGuess-Windows\src\outguess-gui.exe"
-```
-
-### Linux ou macOS
-
-Para cross-compilar os binários Windows em Debian ou Ubuntu:
-
-```bash
-sudo apt install mingw-w64 make
-cd src
-make -f Makefile.mingw \
-  CC=x86_64-w64-mingw32-gcc \
-  AR=x86_64-w64-mingw32-ar \
-  RANLIB=x86_64-w64-mingw32-ranlib
-```
+O build gera os executáveis do projeto em `src/`, conforme a configuração
+atual do `Makefile.mingw`.
 
 ## Estrutura
 
 | Caminho | Descrição |
 | --- | --- |
-| `src/` | Código do OutGuess e build MinGW |
-| `src/jpeg-6b-steg/` | Biblioteca JPEG modificada usada pelo projeto |
-| `src/win32/` | Compatibilidade Windows e `getopt()` |
-| `bin-win64/` | Binários prontos e código-fonte da GUI |
+| `src/` | Código do OutGuess e arquivos de build |
+| `src/jpeg-6b-steg/` | Biblioteca JPEG 6b modificada |
+| `src/win32/` | Camada de compatibilidade Windows |
+| `bin-win64/` | Binários e código-fonte da GUI |
 | `tests/` | Scripts e arquivos de teste |
-| `README-WINDOWS.md` | Notas detalhadas da adaptação Windows |
-| `man/outguess.txt` | Referência completa da linha de comando |
+| `README-WINDOWS.md` | Guia detalhado para Windows |
+| `man/outguess.txt` | Referência da linha de comando |
 
 ## Testes
 
-Os testes de integração são scripts shell e exigem um ambiente POSIX:
+Os testes de integração usam o ambiente de build do projeto:
 
 ```bash
 make check
 ```
 
-Para consultar as opções disponíveis:
+Para uma verificação básica de round-trip, o arquivo ocultado deve ser
+recuperado sem alteração após `embed` e `extract`.
 
-```text
-outguess.exe -h
-```
+## Compatibilidade e portabilidade
+
+A adaptação Windows concentra as mudanças específicas do sistema em
+`src/win32/` e mantém o código principal do OutGuess separado da camada de
+compatibilidade.
+
+Consulte [README-WINDOWS.md](README-WINDOWS.md) para detalhes técnicos sobre
+`getopt()`, byte order, tipos BSD, modo binário de arquivos e configuração
+da biblioteca JPEG.
 
 ## Licença e créditos
 
-O projeto usa licença BSD. Consulte [LICENSE](LICENSE) e os cabeçalhos dos
-arquivos-fonte. OutGuess foi originalmente desenvolvido por Niels Provos e
-é mantido pela comunidade [Resurrecting Open Source Projects](https://github.com/resurrecting-open-source-projects/outguess).
+O projeto utiliza licença BSD. Consulte [LICENSE](LICENSE) e os cabeçalhos
+dos arquivos-fonte.
 
-O projeto também incorpora a biblioteca JPEG 6b modificada, código Arc4,
-MD5 e o código de correção de erros Golay. Consulte
-[CONTRIBUTING.md](CONTRIBUTING.md) para contribuir.
+O OutGuess foi originalmente desenvolvido por **Niels Provos** e é mantido
+pela comunidade [Resurrecting Open Source Projects](https://github.com/resurrecting-open-source-projects/outguess).
+
+O projeto também incorpora componentes relacionados a JPEG 6b, Arc4, MD5 e
+correção de erros Golay. Consulte [CONTRIBUTING.md](CONTRIBUTING.md) para
+informações sobre contribuição.
