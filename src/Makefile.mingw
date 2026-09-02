@@ -1,0 +1,49 @@
+# Makefile.mingw - build nativo para Windows (MinGW-w64)
+#
+# Uso:
+#   No Linux/macOS, fazendo cross-compile para Windows:
+#     make -f Makefile.mingw CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar RANLIB=x86_64-w64-mingw32-ranlib
+#
+#   No Windows, dentro do MSYS2 MinGW64 shell (pacote mingw-w64-x86_64-gcc):
+#     make -f Makefile.mingw
+#
+# Gera outguess.exe, histogram.exe e outguess-gui.exe estaticos (sem DLLs externas alem de
+# KERNEL32.dll e msvcrt.dll, que fazem parte de todo Windows).
+
+CC      = gcc
+AR      = ar
+RANLIB  = ranlib
+CFLAGS  ?= -O2 -w
+JPEGDIR := jpeg-6b-steg
+
+all: outguess.exe histogram.exe outguess-gui.exe
+
+$(JPEGDIR)/jconfig.h: FORCE
+	cp $(JPEGDIR)/jconfig.vc $(JPEGDIR)/jconfig.h
+
+$(JPEGDIR)/libjpeg.a: $(JPEGDIR)/jconfig.h
+	$(MAKE) -C $(JPEGDIR) -f makefile.ansi \
+		CC="$(CC)" AR="$(AR) rc" AR2="$(RANLIB)" \
+		CFLAGS="$(CFLAGS) -DHAVE_STDC_HEADERS" libjpeg.a
+
+OUTGUESS_SRCS := outguess.c golay.c arc.c pnm.c jpg.c iterator.c md5.c err.c win32/getopt.c
+HISTOGRAM_SRCS := histogram.c err.c win32/getopt.c
+
+outguess.exe: $(JPEGDIR)/libjpeg.a $(OUTGUESS_SRCS)
+	$(CC) $(CFLAGS) -static -I. -I$(JPEGDIR) $(OUTGUESS_SRCS) \
+		-o outguess.exe $(JPEGDIR)/libjpeg.a -lm
+
+histogram.exe: $(HISTOGRAM_SRCS)
+	$(CC) $(CFLAGS) -static -I. -I$(JPEGDIR) $(HISTOGRAM_SRCS) \
+		-o histogram.exe -lm
+
+outguess-gui.exe: ../bin-win64/outguess-gui.c outguess.exe
+	$(CC) $(CFLAGS) -static -mwindows ../bin-win64/outguess-gui.c \
+		-o outguess-gui.exe -lcomctl32 -lcomdlg32
+
+clean:
+	rm -f *.o win32/*.o $(JPEGDIR)/*.o $(JPEGDIR)/libjpeg.a $(JPEGDIR)/jconfig.h outguess.exe histogram.exe outguess-gui.exe
+
+.PHONY: all clean
+
+FORCE:

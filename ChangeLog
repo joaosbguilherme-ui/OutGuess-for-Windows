@@ -1,0 +1,122 @@
+OutGuess 0.4
+------------
+2021-09-02 - Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+
+   [ Daniel T. Borelli ]
+
+ - Fixed 'Unknown data type' for .pnm files.
+
+   [ Joao Eriberto Mota Filho ]
+
+ - Clarified licensing for src/golay.c. Many thanks to Robert Morelos-Zaragoza.
+   See details in doc/LICENSE.golay.
+ - Enabled CI test for .pnm files.
+
+OutGuess 0.3
+------------
+2021-08-20 - Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+
+   [ Joao Eriberto Mota Filho ]
+
+ - Created CI test for GitHub.
+ - Created CONTRIBUTING file.
+ - Migrated manpage to txt2man.
+ - Moved documents to /doc.
+ - Moved all source code to /src.
+ - Re-made all installation system from zero.
+ - Reviewed and updated README file.
+
+   [ Robin Vobruba ]
+
+ - Added option -h.
+ - Fixed issues with .ppm files.
+ - Lots of changes and important improvements in source code.
+
+OutGuess 0.2.2
+--------------
+2019-01-21 - Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+ - Using a right compiler to fix cross compiling issues.
+   See Debian bug #913545 for details.
+
+OutGuess 0.2.1
+--------------
+2018-11-11 - Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+
+   [ Joao Eriberto Mota Filho ]
+
+ - Added a NEWS file.
+ - Fixed an issue in configure.in and allow autoreconf.
+ - Fixed some GCC warnings.
+ - Fixed some spelling errors in final binaries.
+ - Fixed spelling errors in outguess manpage.
+ - Removed the jpeg-6b-steg/configure file because it have
+   not a source code. See Debian bug #882538 for details.
+ - Removed old CVS directories.
+
+   [ Chris Rorvick ]
+
+ - Some fixes from Chris Rorvick's GitHub repository[1]:
+    * Fixed printf format strings.
+    * Fixed segfault when encoding PNM images.
+    * Pass struct size to memset(), not pointer size.
+
+   [1] https://github.com/crorvick/outguess
+
+   [ Debian Project ]
+
+ - Added manpage for seek_script. This manpage was written for Debian Project
+   by Samuele Giovanni Tonon <samu@debian.org>.
+ - Changes outguess.c to match outguess-extract. Fix from Debian patch
+   10_avoid-direct-changes.patch. Thanks to Samuele Giovanni Tonon
+   <samu@debian.org>.
+ - Use an alternative pre-built Makefile. Fix from Debian patch
+   60_generate-configure.patch. Thanks to Frédéric Bonnard <frediz@debian.org>.
+
+
+OutGuess 0.2
+------------
+2000-01-20 - Niels Provos <provos@citi.umich.edu>
+ - Use statistical corrections to defend against steganalysis.
+
+2000-04-01 - Niels Provos <provos@citi.umich.edu>
+ - A lot of cleanup.
+ - Use all DCT coefficients for JPG now.  This version is not any more
+   compatible with the previous versions.
+
+OutGuess 0.13b
+--------------
+1999-08-06 - Niels Provos <provos@citi.umich.edu>
+ - Add additional statistics for analysis purposes.
+ - Fix a bug that changed bits in searching mode.
+
+OutGuess 0.13
+-------------
+1999-07-18 - Niels Provos <provos@citi.umich.edu>
+
+- With ECC introduce errors where possible to avoid changing bits
+  with high detectability.
+- Add statistics for changed bits distribution via -t flag
+- Give a weight to each bit to indicate its detectability.
+
+OutGuess 0.12
+-------------
+1999-07-10 - Niels Provos <provos@citi.umich.edu>
+
+- Make the Golay encoding work with tolerating 3 bit errors.
+
+OutGuess 0.11
+-------------
+1999-07-07 - Niels Provos <provos@citi.umich.edu>
+
+- Via configure allow compilation on other systems than OpenBSD
+- Pass a parameter to the destination handler, for JPEG it is the
+  compression quality, but e.g. for wav or mp3 it could be frequency
+  and sample rate.
+- Output the total number of bits changed for easier batch processing.
+- Reduce the number of bit errors allowed in the Golay code from 3 to
+  2 per 23-bit block.
+
+OutGuess 0.1
+------------
+
+1999-07-05 - Niels Provos <provos@citi.umich.edu>
