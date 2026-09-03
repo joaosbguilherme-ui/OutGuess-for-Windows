@@ -179,9 +179,36 @@ static void QuoteInto(char *dst, size_t dstsize, const char *src)
 	snprintf(dst, dstsize, "\"%s\"", src);
 }
 
+static int CreateTempMessageFile(const char *message, char *path, DWORD pathsize)
+{
+	char tempDir[MAX_PATH];
+	DWORD tempDirLength = GetTempPathA(sizeof(tempDir), tempDir);
+	if (tempDirLength == 0 || tempDirLength >= sizeof(tempDir))
+		return 0;
+	if (GetTempFileNameA(tempDir, "ogs", 0, path) == 0)
+		return 0;
+
+	FILE *file = fopen(path, "wb");
+	if (!file) {
+		DeleteFileA(path);
+		return 0;
+	}
+
+	size_t messageLength = strlen(message);
+	int written = fwrite(message, 1, messageLength, file) == messageLength;
+	if (fclose(file) != 0)
+		written = 0;
+	if (!written) {
+		DeleteFileA(path);
+		return 0;
+	}
+	return 1;
+}
+
 static void OnRun(void)
 {
 	char imgin[MAX_PATH], msgfile[MAX_PATH], imgout[MAX_PATH], key[512];
+	char tempMessageFile[MAX_PATH] = "";
 	GetWindowTextA(hImgIn, imgin, MAX_PATH);
 	GetWindowTextA(hMsgFile, msgfile, MAX_PATH);
 	GetWindowTextA(hImgOut, imgout, MAX_PATH);
@@ -205,14 +232,24 @@ static void OnRun(void)
 
 	if (ModoEmbutir()) {
 		if (msgfile[0] == '\0') {
-			MessageBoxA(hMain, "Escolha o arquivo de mensagem a esconder.", "Campo faltando", MB_ICONWARNING);
+			MessageBoxA(hMain, "Digite uma mensagem ou escolha um arquivo.", "Campo faltando", MB_ICONWARNING);
 			return;
 		}
 		if (imgout[0] == '\0') {
 			MessageBoxA(hMain, "Escolha onde salvar a imagem de saida.", "Campo faltando", MB_ICONWARNING);
 			return;
 		}
-		QuoteInto(q_msgfile, sizeof(q_msgfile), msgfile);
+		DWORD messageAttributes = GetFileAttributesA(msgfile);
+		if (messageAttributes == INVALID_FILE_ATTRIBUTES ||
+		    (messageAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+			if (!CreateTempMessageFile(msgfile, tempMessageFile, sizeof(tempMessageFile))) {
+				MessageBoxA(hMain, "Nao foi possivel preparar a mensagem.", "Erro", MB_ICONERROR);
+				return;
+			}
+			QuoteInto(q_msgfile, sizeof(q_msgfile), tempMessageFile);
+		} else {
+			QuoteInto(q_msgfile, sizeof(q_msgfile), msgfile);
+		}
 		QuoteInto(q_imgout, sizeof(q_imgout), imgout);
 		snprintf(args, sizeof(args), "-k %s %s-d %s %s %s",
 			q_key, ecc ? "-e " : "", q_msgfile, q_imgin, q_imgout);
@@ -229,6 +266,8 @@ static void OnRun(void)
 	EnableWindow(GetDlgItem(hMain, ID_BTN_RUN), FALSE);
 	int rc = RunOutguess(args);
 	EnableWindow(GetDlgItem(hMain, ID_BTN_RUN), TRUE);
+	if (tempMessageFile[0] != '\0')
+		DeleteFileA(tempMessageFile);
 
 	if (rc == 0) {
 		AppendLogLine(ModoEmbutir()
@@ -283,7 +322,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp)
 			492, 72, 100, 24, hwnd, (HMENU)ID_BTN_IMGIN, NULL, NULL);
 		SendMessage(hImgIn, WM_SETFONT, (WPARAM)hFont, TRUE);
 
-		hLblMsgFile = CreateWindowA("STATIC", "Mensagem a esconder:", WS_CHILD | WS_VISIBLE,
+		hLblMsgFile = CreateWindowA("STATIC", "Mensagem ou arquivo a esconder:", WS_CHILD | WS_VISIBLE,
 			12, 108, 260, 20, hwnd, (HMENU)ID_LBL_MSGFILE, NULL, NULL);
 		hMsgFile = CreateWindowA("EDIT", "", WS_CHILD | WS_VISIBLE | WS_BORDER | ES_AUTOHSCROLL,
 			12, 130, 470, 24, hwnd, (HMENU)ID_EDIT_MSGFILE, NULL, NULL);
