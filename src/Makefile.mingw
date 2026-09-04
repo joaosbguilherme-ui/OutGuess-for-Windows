@@ -16,7 +16,7 @@ RANLIB  = ranlib
 CFLAGS  ?= -O2 -w
 JPEGDIR := jpeg-6b-steg
 
-all: outguess.exe histogram.exe outguess-gui.exe
+all: outguess.exe histogram.exe outguess-gui.exe capacity.exe metadata.exe batch.exe
 
 $(JPEGDIR)/jconfig.h: FORCE
 	cp $(JPEGDIR)/jconfig.vc $(JPEGDIR)/jconfig.h
@@ -37,12 +37,26 @@ histogram.exe: $(HISTOGRAM_SRCS)
 	$(CC) $(CFLAGS) -static -I. -I$(JPEGDIR) $(HISTOGRAM_SRCS) \
 		-o histogram.exe -lm
 
-outguess-gui.exe: ../bin-win64/outguess-gui.c outguess.exe
+../bin-win64/outguess-gui.res: ../bin-win64/outguess-gui.rc ../bin-win64/outguess-gui.manifest
+	windres ../bin-win64/outguess-gui.rc -O coff -o ../bin-win64/outguess-gui.res
+
+outguess-gui.exe: ../bin-win64/outguess-gui.c ../bin-win64/outguess-gui.res outguess.exe
 	$(CC) $(CFLAGS) -static -mwindows ../bin-win64/outguess-gui.c \
-		-o outguess-gui.exe -lcomctl32 -lcomdlg32
+		../bin-win64/outguess-gui.res -o outguess-gui.exe -lcomctl32 -lcomdlg32
+
+capacity.exe: tools/capacity.c $(OUTGUESS_SRCS)
+	$(CC) $(CFLAGS) -static -I. -I$(JPEGDIR) tools/capacity.c \
+		arc.c pnm.c jpg.c md5.c err.c win32/getopt.c $(JPEGDIR)/libjpeg.a \
+		-o capacity.exe -lm
+
+metadata.exe: tools/metadata.c
+	$(CC) $(CFLAGS) -static tools/metadata.c -o metadata.exe
+
+batch.exe: tools/batch.c
+	$(CC) $(CFLAGS) -static tools/batch.c -o batch.exe
 
 clean:
-	rm -f *.o win32/*.o $(JPEGDIR)/*.o $(JPEGDIR)/libjpeg.a $(JPEGDIR)/jconfig.h outguess.exe histogram.exe outguess-gui.exe
+	rm -f *.o win32/*.o tools/*.o $(JPEGDIR)/*.o $(JPEGDIR)/libjpeg.a $(JPEGDIR)/jconfig.h outguess.exe histogram.exe outguess-gui.exe capacity.exe metadata.exe batch.exe ../bin-win64/outguess-gui.res
 
 .PHONY: all clean
 

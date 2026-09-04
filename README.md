@@ -22,6 +22,13 @@ Veja as instruções completas para Windows em
 - Chave secreta para codificação do payload.
 - Correção de erros Golay com a opção `-e`.
 - Preservação das estatísticas de frequência em JPEG.
+```
+
+A opção `-k` é opcional. Quando omitida, o OutGuess usa a chave padrão
+compatível com a versão original:
+
+```powershell
+.\outguess.exe -d ".\mensagem.txt" ".\imagem.jpg" ".\saida.jpg"
 - Executáveis Windows 64-bit.
 - Interface gráfica nativa Win32.
 - Build com MinGW-w64.
@@ -48,7 +55,8 @@ cd "C:\caminho\OutGuess-for-Windows\bin-win64"
 A chave utilizada na extração deve ser exatamente a mesma utilizada na
 inserção. Os arquivos de entrada e os diretórios de destino precisam existir.
 
-### Ver a ajuda
+A chave e a opção de correção de erros. Se a chave ficar vazia,
+ela usa a chave padrão do OutGuess original.
 
 ```powershell
 .\outguess.exe -h
@@ -85,6 +93,23 @@ make -f Makefile.mingw
 O build gera os executáveis do projeto em `src/`, conforme a configuração
 atual do `Makefile.mingw`.
 
+## GitHub Actions
+
+O workflow em `.github/workflows/build-windows.yml` compila automaticamente
+os executáveis no Windows usando MSYS2 MinGW64 e gera `outguess-windows.zip`
+com os binários e a documentação.
+
+- Em cada push para `main` ou pull request, o ZIP fica disponível em **Actions > Artifacts**.
+- Para criar uma Release automática, envie uma tag de versão:
+
+```powershell
+git tag v1.0.2
+git push origin v1.0.2
+```
+
+O workflow cria a Release e anexa o ZIP com `outguess.exe`, `outguess-gui.exe`,
+`histogram.exe`, `capacity.exe`, `metadata.exe` e `batch.exe`.
+
 ## Estrutura
 
 | Caminho | Descrição |
@@ -107,6 +132,24 @@ make check
 
 Para uma verificação básica de round-trip, o arquivo ocultado deve ser
 recuperado sem alteração após `embed` e `extract`.
+
+## Ferramentas auxiliares
+
+O build Windows também gera utilitários para análise e processamento em lote:
+
+```text
+capacity.exe -e -p 85 imagem.jpg
+metadata.exe imagem.jpg
+batch.exe embed -e -p 85 -k "senha" -m .\mensagem.txt -i ".\imagens\*.jpg" -o .\output
+batch.exe extract -e -k "senha" -i ".\output\*.jpg" -o .\extraidas
+```
+
+`capacity.exe` estima os bits utilizáveis e a capacidade com correção de erros
+sem modificar a imagem. `metadata.exe` mostra dimensões, componentes, espaço
+de cor e marcadores JFIF, EXIF, IPTC e XMP. `batch.exe` processa arquivos
+encontrados por curingas e exibe o total de sucessos e falhas. No batch, `-e`
+ativa correção de erros, `-p` define a qualidade JPEG e `-f` permite substituir
+arquivos existentes; sem `-f`, saídas existentes são ignoradas.
 
 ## Compatibilidade e portabilidade
 

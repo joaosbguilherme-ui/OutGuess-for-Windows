@@ -87,6 +87,9 @@ Os artefatos gerados dependem das regras presentes no
 - `outguess.exe`
 - `histogram.exe`
 - `outguess-gui.exe`
+- `capacity.exe`
+- `metadata.exe`
+- `batch.exe`
 
 ## Executar a GUI
 
@@ -97,7 +100,54 @@ cd "C:\caminho\OutGuess-for-Windows\src"
 Start-Process ".\outguess-gui.exe"
 ```
 
-Mantenha `outguess.exe` no mesmo diretório da GUI.
+Mantenha `outguess.exe` no mesmo diretório da GUI. A chave secreta é opcional;
+quando o campo fica vazio, a GUI omite `-k` e o executável usa `Default key`,
+como no OutGuess original.
+
+### Ferramentas de análise e lote
+
+Verifique a capacidade de uma imagem sem gerar uma saída:
+
+```powershell
+.\capacity.exe -e -p 85 .\imagem.jpg
+```
+
+Inspecione dimensões, componentes e marcadores JPEG:
+
+```powershell
+.\metadata.exe .\imagem.jpg
+```
+
+Processe várias imagens usando curingas do Windows:
+
+```powershell
+.\batch.exe embed -e -p 85 -k "senha" -m .\mensagem.txt -i ".\imagens\*.jpg" -o .\output
+.\batch.exe extract -e -k "senha" -i ".\output\*.jpg" -o .\extraidas
+```
+
+O `batch.exe` cria o diretório de saída quando necessário e exibe a quantidade
+de arquivos processados, sucessos e falhas. A opção `-k` também é opcional;
+sem ela, usa a chave padrão do OutGuess. A opção `-f` permite sobrescrever
+saídas existentes; sem `-f`, esses arquivos são ignorados.
+
+A GUI oferece os seguintes recursos:
+
+- Texto digitado diretamente ou arquivo de mensagem selecionado.
+- Arrastar e soltar uma imagem ou arquivo na janela.
+- Histórico dos últimos caminhos usados nos campos de arquivo.
+- Botão para consultar a capacidade da imagem antes do embed.
+- Botão para copiar o log para a área de transferência.
+- Qualidade JPEG entre 75 e 100.
+- Limite de iterações entre 0 e 65535.
+- Barra de progresso e status durante operações longas.
+- Botão para limpar o log e abrir a pasta do resultado.
+- Proteção contra sobrescrita ativada por padrão e confirmação antes da operação.
+- Suporte a DPI alto por manifesto Windows.
+
+As opções de qualidade e iterações são convertidas para os parâmetros
+tradicionais `-p` e `-i` do OutGuess. A capacidade efetiva da imagem continua
+sendo calculada pelo executável e aparece no log, pois depende do conteúdo
+JPEG e das estatísticas da imagem.
 
 ## Uso pela linha de comando
 
