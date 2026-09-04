@@ -161,6 +161,18 @@ Consulte [README-WINDOWS.md](README-WINDOWS.md) para detalhes técnicos sobre
 `getopt()`, byte order, tipos BSD, modo binário de arquivos e configuração
 da biblioteca JPEG.
 
+## 🤖 Powered by AI / Desenvolvimento Assistido por IA
+
+Este projeto é um exemplo prático de como a Inteligência Artificial pode ser utilizada para acelerar a modernização, portabilidade e engenharia reversa de software legado. 
+
+Para trazer o **OutGuess** original (historicamente dependente do ecossistema Unix) nativamente para o ecossistema moderno do Windows 11, o desenvolvimento contou com o auxílio de IA nas seguintes frentes:
+
+* **Tradução e Refatoração de Código:** Adaptação de chamadas de sistema exclusivas do padrão POSIX para equivalentes nativas da API do Windows (`Win32`/`MSVC`).
+* **Resolução de Dependências Legadas:** Conversão automatizada de arquivos de build legados (como *Makefiles* clássicos) para estruturas modernas de compilação compatíveis com o ambiente Windows.
+* **Validação e Casos de Teste:** Geração de scripts automatizados baseados em padrões de esteganografia conhecidos para garantir que o comportamento criptográfico da portagem nativa seja 100% idêntico ao original do Linux.
+
+A utilização de IA permitiu reduzir drasticamente o tempo necessário para analisar o comportamento do código original de 1999/2001, contornar conflitos de ponteiros e gerenciar a manipulação de arquivos binários no Windows de forma segura e performática.
+
 ## Licença e créditos
 
 O projeto utiliza licença BSD. Consulte [LICENSE](LICENSE) e os cabeçalhos
